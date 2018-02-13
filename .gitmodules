@@ -1,4 +1,4 @@
 [submodule "src/rules"]
-	path = src/rules
+	path = rules
 	url = https://github.com/lightsing/https-everywhere.git
 	branch = rules
