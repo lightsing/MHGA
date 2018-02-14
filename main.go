@@ -13,14 +13,14 @@ import (
 func main() {
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = true
-	pattern := regexp.MustCompile(`(?i)^http:\/\/`)
+	pattern := regexp.MustCompile(`(?i)^http:`)
 	proxy.OnRequest(goproxy.DstHostIs("store.steampowered.com")).DoFunc(
 		func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			resp := &http.Response{}
 			resp.Request = req
 			resp.TransferEncoding = req.TransferEncoding
 			resp.Header = make(http.Header)
-			resp.Header.Add("Location", pattern.ReplaceAllString(req.RequestURI, "https://"))
+			resp.Header.Add("Location", pattern.ReplaceAllString(req.RequestURI, "https:"))
 			resp.Header.Add("Content-Type", goproxy.ContentTypeHtml)
 			resp.StatusCode = http.StatusMovedPermanently
 
