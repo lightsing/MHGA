@@ -27,8 +27,8 @@ func main() {
 			buf := bytes.NewBufferString(`<html>
 <head><title>301 Moved Permanently</title></head>
 <body bgcolor="white">
-<center><h1>404 Not Found</h1></center>
-<hr><center>nginx/1.12.1</center>
+<center><h1>301 Moved Permanently</h1></center>
+<hr><center>MHGA</center>
 </body>
 </html>
 `)
