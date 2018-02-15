@@ -32,12 +32,19 @@ type Tester interface {
 	Is(string) bool
 }
 
+var hostRegexp = regexp.MustCompile(`(?im)^(https?://)?([0-9a-zA-Z.]+).*$`)
+
+func hostGlob (pattern, subj string) bool {
+	match := hostRegexp.FindStringSubmatch(subj)
+	return glob.Glob(pattern, match[len(match) - 1])
+}
+
 func (t *Target) Is(test string) bool {
-	return glob.Glob(t.Host, test)
+	return hostGlob(t.Host, test)
 }
 
 func (e *Exclusion) Is(test string) bool {
-	return glob.Glob(e.Pattern, test)
+	return hostGlob(e.Pattern, test)
 }
 
 func (r *Rule) Init() *Rule {
@@ -59,7 +66,7 @@ func main() {
 		}
 		fmt.Printf("%v\n", ruleSet)
 		for _, target := range ruleSet.Targets {
-			fmt.Println(target.Is("www.google.com.hk"))
+			fmt.Println(target.Is("http://www.google.com.hk/test"))
 		}
 	}
 
