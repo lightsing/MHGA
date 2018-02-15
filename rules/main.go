@@ -1,10 +1,10 @@
 package main
 
 import (
-"fmt"
-"encoding/xml"
-"os"
+	"encoding/xml"
+	"fmt"
 	"github.com/ryanuber/go-glob"
+	"os"
 	"regexp"
 )
 
@@ -17,15 +17,15 @@ type Exclusion struct {
 }
 
 type Rule struct {
-	From string `xml:"from,attr"`
-	To string `xml:"to,attr"`
+	From   string `xml:"from,attr"`
+	To     string `xml:"to,attr"`
 	FromRe *regexp.Regexp
 }
 
 type RuleSet struct {
-	Targets []Target `xml:"target"`
+	Targets    []Target    `xml:"target"`
 	Exclusions []Exclusion `xml:"exclusion"`
-	Rules []Rule `xml:"rule"`
+	Rules      []Rule      `xml:"rule"`
 }
 
 type Tester interface {
@@ -34,9 +34,9 @@ type Tester interface {
 
 var hostRegexp = regexp.MustCompile(`(?im)^(https?://)?([0-9a-zA-Z.]+).*$`)
 
-func hostGlob (pattern, subj string) bool {
+func hostGlob(pattern, subj string) bool {
 	match := hostRegexp.FindStringSubmatch(subj)
-	return glob.Glob(pattern, match[len(match) - 1])
+	return glob.Glob(pattern, match[len(match)-1])
 }
 
 func (t *Target) Is(test string) bool {
@@ -53,7 +53,7 @@ func (r *Rule) Init() *Rule {
 }
 
 func main() {
-	reader, err:= os.Open("rules/rules/rules/Google.xml")
+	reader, err := os.Open("rules/rules/rules/Google.xml")
 	if err != nil {
 		panic(err)
 	}

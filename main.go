@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/elazarl/goproxy"
-	"log"
-	"regexp"
-	"net/http"
 	"bytes"
+	"github.com/elazarl/goproxy"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"regexp"
 )
-
 
 func main() {
 	proxy := goproxy.NewProxyHttpServer()
