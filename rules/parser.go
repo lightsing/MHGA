@@ -47,9 +47,12 @@ func (e *Exclusion) Is(test string) bool {
 	return hostGlob(e.Pattern, test)
 }
 
-func (r *Rule) Init() *Rule {
-	r.FromRe = regexp.MustCompile(r.From)
-	return r
+func (r *Rule) Init() error {
+	var err error
+	if r.FromRe, err = regexp.Compile(r.From); err != nil{
+		return errors.New("regex parse error")
+	}
+	return nil
 }
 
 func (r *Rule) Apply(uri string) string {
@@ -87,7 +90,9 @@ func LoadRuleSet(any interface{}) (*RuleSet, error){
 			return nil, err
 		} else {
 			for i := range ruleSet.Rules {
-				ruleSet.Rules[i].Init()
+				if err := ruleSet.Rules[i].Init(); err != nil {
+					return nil, err
+				}
 			}
 			return &ruleSet, nil
 		}
