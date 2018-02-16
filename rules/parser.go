@@ -47,6 +47,20 @@ func (e *Exclusion) Is(test string) bool {
 	return hostGlob(e.Pattern, test)
 }
 
+func (rs *RuleSet) Is(test string) bool {
+	for _, exclusion := range rs.Exclusions {
+		if exclusion.Is(test) {
+			return false
+		}
+	}
+	for _, target := range rs.Targets {
+		if target.Is(test) {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *Rule) Init() error {
 	var err error
 	if r.FromRe, err = regexp.Compile(r.From); err != nil{

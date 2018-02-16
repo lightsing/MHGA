@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"os"
 	log "github.com/sirupsen/logrus"
+	"errors"
 )
 
 type RuleSets struct {
@@ -14,11 +15,20 @@ type RuleSets struct {
 }
 
 func NewRuleSets() *RuleSets {
-	return &RuleSets{
+	ruleSets := RuleSets{
 		RuleSets: make([]*RuleSet, 0),
-		Targets: gcache.New(20).ARC().Build(),
+		Targets: nil,
 		RuleCache: gcache.New(20).ARC().Build(),
 	}
+	ruleSets.Targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
+		for _, ruleSet := range ruleSets.RuleSets {
+			if ruleSet.Is(test.(string)) {
+				return ruleSet, nil
+			}
+		}
+		return nil, errors.New("applicable rule not found")
+	}).Build()
+	return &ruleSets
 }
 
 func LoadRuleSets(root string) (*RuleSets, error) {
