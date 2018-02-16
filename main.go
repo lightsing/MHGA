@@ -1,16 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"github.com/elazarl/goproxy"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"regexp"
+	"fmt"
+	"github.com/lightsing/makehttps/rules"
 )
 
 func main() {
-	proxy := goproxy.NewProxyHttpServer()
+	/*proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = true
 	pattern := regexp.MustCompile(`(?i)^http:`)
 	proxy.OnRequest(goproxy.DstHostIs("store.steampowered.com")).DoFunc(
@@ -35,5 +31,14 @@ func main() {
 			resp.Body = ioutil.NopCloser(buf)
 			return req, resp
 		})
-	log.Fatal(http.ListenAndServe(":8080", proxy))
+	log.Fatal(http.ListenAndServe(":8080", proxy))*/
+	ruleSet, err := rules.LoadRuleSet("rules/rules/rules/Google.xml")
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("%v\n", ruleSet)
+		for _, target := range ruleSet.Targets {
+			fmt.Println(target.Is("http://www.google.com.hk/test"))
+		}
+	}
 }

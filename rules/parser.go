@@ -1,11 +1,11 @@
-package main
+package rules
 
 import (
 	"encoding/xml"
-	"fmt"
 	"github.com/ryanuber/go-glob"
-	"os"
 	"regexp"
+	"os"
+	"errors"
 )
 
 type Target struct {
@@ -52,22 +52,24 @@ func (r *Rule) Init() *Rule {
 	return r
 }
 
-func main() {
-	reader, err := os.Open("rules/rules/rules/Google.xml")
-	if err != nil {
-		panic(err)
-	}
-	var ruleSet RuleSet
-	if err := xml.NewDecoder(reader).Decode(&ruleSet); err != nil {
-		panic(err)
+func LoadRuleSet(any interface{}) (*RuleSet, error){
+	if name, ok := any.(string); ok {
+		if reader, err := os.Open(name); err != nil{
+			return nil, err
+		} else {
+			return LoadRuleSet(reader)
+		}
+	} else if reader, ok := any.(*os.File); ok {
+		var ruleSet RuleSet
+		if err := xml.NewDecoder(reader).Decode(&ruleSet); err != nil {
+			return nil, err
+		} else {
+			for i := range ruleSet.Rules {
+				ruleSet.Rules[i].Init()
+			}
+			return &ruleSet, nil
+		}
 	} else {
-		for i := range ruleSet.Rules {
-			ruleSet.Rules[i].Init()
-		}
-		fmt.Printf("%v\n", ruleSet)
-		for _, target := range ruleSet.Targets {
-			fmt.Println(target.Is("http://www.google.com.hk/test"))
-		}
+		return nil, errors.New("arg type error")
 	}
-
 }
