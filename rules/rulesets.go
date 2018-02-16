@@ -6,12 +6,14 @@ import (
 	"os"
 	log "github.com/sirupsen/logrus"
 	"errors"
+	"sync"
 )
 
 type RuleSets struct {
 	RuleSets []*RuleSet
 	Targets gcache.Cache
 	RuleCache gcache.Cache
+	Lock sync.RWMutex
 }
 
 func NewRuleSets() *RuleSets {
@@ -38,14 +40,18 @@ func LoadRuleSets(root string) (*RuleSets, error) {
 			log.Warnf("WalkFunc Error, %s\n", err)
 			return err
 		}
-		if ruleSet, err := LoadRuleSet(path); err == nil {
-			log.Debugf("Adding: %s\n", path)
-			ruleSets.RuleSets = append(ruleSets.RuleSets, ruleSet)
-		} else {
-			// possibly caused by re2 bug(feature)
-			// or not a xml file
-			log.Infof("Parse rule fail, ignore %s (caused by [%s])", path, err)
-		}
+		go func() {
+			if ruleSet, err := LoadRuleSet(path); err == nil {
+				log.Debugf("Adding: %s\n", path)
+				ruleSets.Lock.Lock()
+				ruleSets.RuleSets = append(ruleSets.RuleSets, ruleSet)
+				ruleSets.Lock.Unlock()
+			} else {
+				// possibly caused by re2 bug(feature)
+				// or not a xml file
+				log.Infof("Parse rule fail, ignore %s (caused by [%s])", path, err)
+			}
+		}()
 		return nil
 	})
 	if err != nil {
