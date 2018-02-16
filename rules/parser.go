@@ -52,6 +52,28 @@ func (r *Rule) Init() *Rule {
 	return r
 }
 
+func (r *Rule) Apply(uri string) string {
+	return r.FromRe.ReplaceAllString(uri, r.To);
+}
+
+func (rs *RuleSet) Apply(urispec string) (*string, bool){
+	for _, exclusion := range rs.Exclusions {
+		if exclusion.Is(urispec) {
+			return nil, false
+		}
+	}
+	for _, target := range rs.Targets {
+		if target.Is(urispec) {
+			for _, rule := range rs.Rules {
+				if result := rule.Apply(urispec); result != urispec {
+					return &result, true
+				}
+			}
+		}
+	}
+	return nil, false
+}
+
 func LoadRuleSet(any interface{}) (*RuleSet, error){
 	if name, ok := any.(string); ok {
 		if reader, err := os.Open(name); err != nil{

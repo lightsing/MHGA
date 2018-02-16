@@ -36,9 +36,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("%v\n", ruleSet)
-		for _, target := range ruleSet.Targets {
-			fmt.Println(target.Is("http://www.google.com.hk/test"))
-		}
+		testUri := "http://www.google.com.hk/test"
+		result, _ := ruleSet.Apply("http://www.google.com.hk/test")
+		fmt.Printf("origin: %s\nafter: %s\n", testUri, *result)
 	}
 }
