@@ -23,24 +23,13 @@ func NewRuleSets() *RuleSets {
 		RuleCache: gcache.New(20).ARC().Build(),
 	}
 	ruleSets.Targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
-		resultChan := make(chan *RuleSet)
-		go func() {
-			for i, ruleSet := range ruleSets.RuleSets {
-				go func(i int, ruleSet *RuleSet) {
-					if ruleSet.Is(test.(string)) {
-						log.Warnf("%v", ruleSet)
-						resultChan <- ruleSet
-					} else if i == len(ruleSets.RuleSets)-1 {
-						resultChan <- nil
-					}
-				}(i, ruleSet)
+		for _, ruleSet := range ruleSets.RuleSets {
+			if ruleSet.Is(test.(string)) {
+				log.Warnf("%v", ruleSet)
+				return ruleSet, nil
 			}
-		}()
-		if result := <-resultChan; result != nil {
-			return result, nil
-		} else {
-			return nil, errors.New("applicable rule not found")
 		}
+		return nil, errors.New("applicable rule not found")
 	}).Build()
 	return &ruleSets
 }
