@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"github.com/lightsing/makehttps/rules"
 )
 
 const configName = "config.json"
@@ -21,17 +22,25 @@ var logLevel = map[string]log.Level{
 	"fatal": log.FatalLevel,
 }
 
+type GitConfig struct {
+	Upstream     string `json:"upstream"`
+	Path         string `json:"path"`
+	Depth        int    `json:"depth"`
+	SingleBranch bool   `json:"single-branch"`
+	Branch       string `json:"branch"`
+}
+
 type RuleConfig struct {
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Upstream  string `json:"upstream"`
-	Update    bool   `json:"update"`
-	StorePath string `json:"store-path"`
-	RulePath  string `json:"rule-path"`
+	Name   string    `json:"name"`
+	Type   string    `json:"type"`
+	Update bool      `json:"update"`
+	Git    GitConfig `json:"git"`
+	Path   string    `json:"path"`
 }
 
 type Config struct {
 	Rules []RuleConfig `json:"rules"`
+	AvailableRules []string
 	Log   struct {
 		Level string `json:"level"`
 	} `json:"log"`
@@ -62,8 +71,10 @@ func mustFindConfig(name string) *Config {
 	return config
 }
 
-func Init(name string) {
+func Init(name string) *Config {
 	config := mustFindConfig(name)
+	config.AvailableRules = make([]string, 0)
+
 	switch config.Log.Level {
 	case "debug":
 		log.SetLevel(log.DebugLevel)
@@ -81,4 +92,13 @@ func Init(name string) {
 		log.SetLevel(0)
 	}
 
+	for _, rule := range config.Rules {
+		if err := rules.CheckRule(&rule); err == nil {
+			config.AvailableRules = append(config.AvailableRules, rule.Path)
+		} else {
+			log.Errorf("Rule check fail by (%s)", err)
+		}
+	}
+
+	return config
 }
