@@ -5,19 +5,19 @@ import (
 	log "github.com/sirupsen/logrus"
 	"time"
 	"github.com/elazarl/goproxy"
+	"net/http"
 	"bytes"
 	"io/ioutil"
-	"net/http"
 )
 
-func genResp(req *http.Request, uri *string) *http.Response {
+func genRedirect(req *http.Request, uri string) *http.Response {
 	resp := &http.Response{}
 	resp.Request = req
 	resp.TransferEncoding = req.TransferEncoding
 	resp.Header = make(http.Header)
-	resp.Header.Add("Location", *uri)
+	resp.Header.Add("Location", uri)
 	resp.Header.Add("Content-Type", goproxy.ContentTypeHtml)
-	resp.StatusCode = http.StatusTemporaryRedirect
+	resp.StatusCode = http.StatusMovedPermanently
 
 	buf := bytes.NewBufferString(`<html>
 <head><title>301 Moved Permanently</title></head>
@@ -34,24 +34,24 @@ func genResp(req *http.Request, uri *string) *http.Response {
 
 func main() {
 	// Only log the warning severity or above.
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.InfoLevel)
 	start := time.Now()
 	if ruleSets, err := rules.LoadRuleSets("rules/rules"); err == nil {
 		log.Warnf("Load all rule in %s", time.Since(start))
 		proxy := goproxy.NewProxyHttpServer()
-		proxy.Verbose = true
 		proxy.OnRequest().DoFunc(
 			func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 				start := time.Now()
 				if result, ok := ruleSets.Apply(req.RequestURI); ok {
+					result := *result
 					log.Infof("[%s] Redirect %s to %s", time.Since(start), req.RequestURI, result)
-					return req, genResp(req, result)
+					return req, genRedirect(req, result)
 				}
 				log.Infof("[%s] Nothing to do with %s", time.Since(start), req.RequestURI)
 				return req, nil
 			})
 		log.Fatal(http.ListenAndServe(":8080", proxy))
-
 	}
 
 }
+
