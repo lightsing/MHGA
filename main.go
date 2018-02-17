@@ -13,10 +13,19 @@ func main() {
 	if ruleSets, err := rules.LoadRuleSets("rules/rules"); err == nil {
 		log.Warnf("Load all rule in %s", time.Since(start))
 		test := "http://www.google.com.hk"
-		for range make([]int, 10) {
+		for range make([]int, 5) {
 			start = time.Now()
 			if result, ok := ruleSets.Apply(test); ok {
 				log.Warnf("Apply rule [%s], from (%s) to (%s)", time.Since(start), test, *result)
+			}
+		}
+		test = "http://lightsing.me"
+		for range make([]int, 5) {
+			start = time.Now()
+			if result, ok := ruleSets.Apply(test); ok {
+				log.Warnf("Apply rule [%s], from (%s) to (%s)", time.Since(start), test, *result)
+			} else {
+				log.Warnf("No rule [%s] for (%s)", time.Since(start), test)
 			}
 		}
 

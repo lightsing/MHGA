@@ -26,7 +26,11 @@ func (rs *RuleSets) get(test string) (*RuleSet, bool) {
 func (rs *RuleSets) Apply(test string) (*string, bool) {
 	if result, err := rs.RuleCache.Get(test); err == nil {
 		log.Warnf("Cache hit for %s", test)
-		return result.(*string), true
+		if result, ok := result.(*string); ok {
+			return result, true
+		} else {
+			return nil, false
+		}
 	}
 	log.Warnf("Cache miss for %s", test)
 	if ruleSet, ok := rs.get(test); ok {
@@ -35,6 +39,7 @@ func (rs *RuleSets) Apply(test string) (*string, bool) {
 			return result, true
 		}
 	}
+	rs.RuleCache.Set(test, nil)
 	return nil, false
 }
 
