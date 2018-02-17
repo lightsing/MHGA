@@ -16,6 +16,14 @@ type RuleSets struct {
 	Lock      sync.RWMutex
 }
 
+func (rs *RuleSets) Get(test string) (*RuleSet, error) {
+	if ruleSet, err := rs.RuleCache.Get(test); err == nil {
+		return ruleSet.(*RuleSet), nil
+	}
+	ruleSet, err := rs.Targets.Get(test)
+	return ruleSet.(*RuleSet), err
+}
+
 func NewRuleSets() *RuleSets {
 	ruleSets := RuleSets{
 		RuleSets:  make([]*RuleSet, 0),
