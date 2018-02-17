@@ -12,7 +12,7 @@ based on [EFForg/https-everywhere](https://github.com/EFForg/https-everywhere)
 
 Example:
 
-![Imgur](https://i.imgur.com/YERvcHr.png)
+![Screenshot](https://user-images.githubusercontent.com/15951701/36340403-191cfd44-1417-11e8-911d-62a26f8d29c1.png)
 
 # Feature
 
