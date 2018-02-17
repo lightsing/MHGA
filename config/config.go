@@ -1,35 +1,38 @@
 package config
 
 import (
-	log "github.com/sirupsen/logrus"
+	"encoding/json"
+	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"encoding/json"
-	"io/ioutil"
-	"errors"
 )
 
 const configName = "config.json"
-var configPaths = []string {"/etc/mhga/", "$HOME/mhga/", "."}
+
+var configPaths = []string{"/etc/mhga/", "$HOME/mhga/", "."}
 
 var logLevel = map[string]log.Level{
-	"info": log.InfoLevel,
-	"warn": log.WarnLevel,
+	"info":  log.InfoLevel,
+	"warn":  log.WarnLevel,
 	"error": log.ErrorLevel,
 	"fatal": log.FatalLevel,
 }
 
+type RuleConfig struct {
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Upstream  string `json:"upstream"`
+	Update    bool   `json:"update"`
+	StorePath string `json:"store-path"`
+	RulePath  string `json:"rule-path"`
+}
+
 type Config struct {
-	Rules []struct {
-		Name      string `json:"name"`
-		Type      string `json:"type"`
-		Upstream  string `json:"upstream"`
-		Update    bool   `json:"update"`
-		StorePath string `json:"store-path"`
-		RulePath  string `json:"rule-path"`
-	} `json:"rules"`
-	Log struct {
+	Rules []RuleConfig `json:"rules"`
+	Log   struct {
 		Level string `json:"level"`
 	} `json:"log"`
 }
