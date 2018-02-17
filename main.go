@@ -4,16 +4,18 @@ import (
 	"github.com/elazarl/goproxy"
 	"github.com/lightsing/makehttps/rules"
 	"github.com/lightsing/makehttps/proxy"
+	"github.com/lightsing/makehttps/config"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
+const name = "mhga"
 var Version string
 
 func main() {
 	// Only log the warning severity or above.
-	log.SetLevel(log.InfoLevel)
+	config.Init(name)
 	start := time.Now()
 	if ruleSets, err := rules.LoadRuleSets("rules/rules"); err == nil {
 		log.Warnf("Load all rule in %s", time.Since(start))
