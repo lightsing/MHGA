@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"github.com/elazarl/goproxy"
 	"github.com/lightsing/makehttps/rules"
 	log "github.com/sirupsen/logrus"
-	"time"
-	"github.com/elazarl/goproxy"
-	"net/http"
-	"bytes"
 	"io/ioutil"
+	"net/http"
+	"time"
 )
 
 func genRedirect(req *http.Request, uri string) *http.Response {
@@ -54,4 +54,3 @@ func main() {
 	}
 
 }
-

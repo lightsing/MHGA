@@ -10,21 +10,21 @@ import (
 )
 
 type RuleSets struct {
-	RuleSets  []*RuleSet
-	Targets   gcache.Cache
-	RuleCache gcache.Cache
+	ruleSets  []*RuleSet
+	targets   gcache.Cache
+	ruleCache gcache.Cache
 	Lock      sync.RWMutex
 }
 
 func (rs *RuleSets) get(test string) (*RuleSet, bool) {
-	if ruleSet, err := rs.Targets.Get(test); err == nil {
+	if ruleSet, err := rs.targets.Get(test); err == nil {
 		return ruleSet.(*RuleSet), true
 	}
 	return nil, false
 }
 
 func (rs *RuleSets) Apply(test string) (*string, bool) {
-	if result, err := rs.RuleCache.Get(test); err == nil {
+	if result, err := rs.ruleCache.Get(test); err == nil {
 		log.Warnf("Cache hit for %s", test)
 		if result, ok := result.(*string); ok {
 			return result, true
@@ -35,22 +35,22 @@ func (rs *RuleSets) Apply(test string) (*string, bool) {
 	log.Warnf("Cache miss for %s", test)
 	if ruleSet, ok := rs.get(test); ok {
 		if result, ok := ruleSet.Apply(test); ok {
-			rs.RuleCache.Set(test, result)
+			rs.ruleCache.Set(test, result)
 			return result, true
 		}
 	}
-	rs.RuleCache.Set(test, nil)
+	rs.ruleCache.Set(test, nil)
 	return nil, false
 }
 
 func NewRuleSets() *RuleSets {
 	ruleSets := RuleSets{
-		RuleSets:  make([]*RuleSet, 0),
-		Targets:   nil,
-		RuleCache: gcache.New(20).ARC().Build(),
+		ruleSets:  make([]*RuleSet, 0),
+		targets:   nil,
+		ruleCache: gcache.New(20).ARC().Build(),
 	}
-	ruleSets.Targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
-		for _, ruleSet := range ruleSets.RuleSets {
+	ruleSets.targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
+		for _, ruleSet := range ruleSets.ruleSets {
 			if ruleSet.Is(test.(string)) {
 				//log.Warnf("%v", ruleSet)
 				return ruleSet, nil
@@ -72,7 +72,7 @@ func LoadRuleSets(root string) (*RuleSets, error) {
 			if ruleSet, err := LoadRuleSet(path); err == nil {
 				log.Debugf("Adding: %s\n", path)
 				ruleSets.Lock.Lock()
-				ruleSets.RuleSets = append(ruleSets.RuleSets, ruleSet)
+				ruleSets.ruleSets = append(ruleSets.ruleSets, ruleSet)
 				ruleSets.Lock.Unlock()
 			} else {
 				// possibly caused by re2 bug(feature)
