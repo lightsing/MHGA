@@ -16,12 +16,26 @@ type RuleSets struct {
 	Lock      sync.RWMutex
 }
 
-func (rs *RuleSets) Get(test string) (*RuleSet, error) {
-	if ruleSet, err := rs.RuleCache.Get(test); err == nil {
-		return ruleSet.(*RuleSet), nil
+func (rs *RuleSets) get(test string) (*RuleSet, bool) {
+	if ruleSet, err := rs.Targets.Get(test); err == nil {
+		return ruleSet.(*RuleSet), true
 	}
-	ruleSet, err := rs.Targets.Get(test)
-	return ruleSet.(*RuleSet), err
+	return nil, false
+}
+
+func (rs *RuleSets) Apply(test string) (*string, bool) {
+	if result, err := rs.RuleCache.Get(test); err == nil {
+		log.Warnf("Cache hit for %s", test)
+		return result.(*string), true
+	}
+	log.Warnf("Cache miss for %s", test)
+	if ruleSet, ok := rs.get(test); ok {
+		if result, ok := ruleSet.Apply(test); ok {
+			rs.RuleCache.Set(test, result)
+			return result, true
+		}
+	}
+	return nil, false
 }
 
 func NewRuleSets() *RuleSets {
@@ -33,7 +47,7 @@ func NewRuleSets() *RuleSets {
 	ruleSets.Targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
 		for _, ruleSet := range ruleSets.RuleSets {
 			if ruleSet.Is(test.(string)) {
-				log.Warnf("%v", ruleSet)
+				//log.Warnf("%v", ruleSet)
 				return ruleSet, nil
 			}
 		}
