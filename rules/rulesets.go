@@ -1,42 +1,42 @@
 package rules
 
 import (
-	"github.com/lightsing/gcache"
-	"path/filepath"
-	"os"
-	log "github.com/sirupsen/logrus"
 	"errors"
+	"github.com/lightsing/gcache"
+	log "github.com/sirupsen/logrus"
+	"os"
+	"path/filepath"
 	"sync"
 )
 
 type RuleSets struct {
-	RuleSets []*RuleSet
-	Targets gcache.Cache
+	RuleSets  []*RuleSet
+	Targets   gcache.Cache
 	RuleCache gcache.Cache
-	Lock sync.RWMutex
+	Lock      sync.RWMutex
 }
 
 func NewRuleSets() *RuleSets {
 	ruleSets := RuleSets{
-		RuleSets: make([]*RuleSet, 0),
-		Targets: nil,
+		RuleSets:  make([]*RuleSet, 0),
+		Targets:   nil,
 		RuleCache: gcache.New(20).ARC().Build(),
 	}
 	ruleSets.Targets = gcache.New(20).ARC().LoaderFunc(func(test interface{}) (interface{}, error) {
 		resultChan := make(chan *RuleSet)
-		go func () {
+		go func() {
 			for i, ruleSet := range ruleSets.RuleSets {
-				go func(i int,ruleSet *RuleSet) {
+				go func(i int, ruleSet *RuleSet) {
 					if ruleSet.Is(test.(string)) {
 						log.Warnf("%v", ruleSet)
 						resultChan <- ruleSet
-					} else if i == len(ruleSets.RuleSets) - 1 {
+					} else if i == len(ruleSets.RuleSets)-1 {
 						resultChan <- nil
 					}
 				}(i, ruleSet)
 			}
 		}()
-		if result := <- resultChan; result != nil {
+		if result := <-resultChan; result != nil {
 			return result, nil
 		} else {
 			return nil, errors.New("applicable rule not found")

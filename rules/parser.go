@@ -2,10 +2,10 @@ package rules
 
 import (
 	"encoding/xml"
-	"github.com/ryanuber/go-glob"
-	"regexp"
-	"os"
 	"errors"
+	"github.com/ryanuber/go-glob"
+	"os"
+	"regexp"
 )
 
 type Target struct {
@@ -63,17 +63,17 @@ func (rs *RuleSet) Is(test string) bool {
 
 func (r *Rule) Init() error {
 	var err error
-	if r.FromRe, err = regexp.Compile(r.From); err != nil{
+	if r.FromRe, err = regexp.Compile(r.From); err != nil {
 		return errors.New("regex parse error")
 	}
 	return nil
 }
 
 func (r *Rule) Apply(uri string) string {
-	return r.FromRe.ReplaceAllString(uri, r.To);
+	return r.FromRe.ReplaceAllString(uri, r.To)
 }
 
-func (rs *RuleSet) Apply(urispec string) (*string, bool){
+func (rs *RuleSet) Apply(urispec string) (*string, bool) {
 	for _, exclusion := range rs.Exclusions {
 		if exclusion.Is(urispec) {
 			return nil, false
@@ -91,9 +91,9 @@ func (rs *RuleSet) Apply(urispec string) (*string, bool){
 	return nil, false
 }
 
-func LoadRuleSet(any interface{}) (*RuleSet, error){
+func LoadRuleSet(any interface{}) (*RuleSet, error) {
 	if name, ok := any.(string); ok {
-		if reader, err := os.Open(name); err != nil{
+		if reader, err := os.Open(name); err != nil {
 			return nil, err
 		} else {
 			return LoadRuleSet(reader)
