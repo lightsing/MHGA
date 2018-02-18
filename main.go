@@ -16,7 +16,7 @@ var Version string
 
 func main() {
 	// Only log the warning severity or above.
-	config := config.Init(name)
+	config := config.Init()
 	for _, rule := range config.Rules {
 		if err := rules.CheckRule(&rule); err == nil {
 			config.AvailableRules = append(config.AvailableRules, rule.Path)

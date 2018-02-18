@@ -63,7 +63,7 @@ func mustFindConfig() *Config {
 	return config
 }
 
-func Init(name string) *Config {
+func Init() *Config {
 	config := mustFindConfig()
 	config.AvailableRules = make([]string, 0)
 
@@ -82,6 +82,8 @@ func Init(name string) *Config {
 		log.SetLevel(log.PanicLevel)
 	case "quite":
 		log.SetLevel(0)
+	default:
+		log.SetLevel(log.InfoLevel)
 	}
 
 	return config
