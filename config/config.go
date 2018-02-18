@@ -13,13 +13,6 @@ const configName = "config.json"
 
 var configPaths = []string{"/etc/mhga/", "$HOME/mhga/", "."}
 
-var logLevel = map[string]log.Level{
-	"info":  log.InfoLevel,
-	"warn":  log.WarnLevel,
-	"error": log.ErrorLevel,
-	"fatal": log.FatalLevel,
-}
-
 type GitConfig struct {
 	Upstream     string `json:"upstream"`
 	Path         string `json:"path"`
@@ -38,6 +31,7 @@ type RuleConfig struct {
 
 type Config struct {
 	Rules []RuleConfig `json:"rules"`
+	Address  string `json:"address"`
 	AvailableRules []string
 	Log   struct {
 		Level string `json:"level"`

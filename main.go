@@ -51,7 +51,7 @@ func main() {
 			log.Infof("[%s] Nothing to do with %s", time.Since(start), req.RequestURI)
 			return req, nil
 		})
-	log.Fatal(http.ListenAndServe(":8080", server))
+	log.Fatal(http.ListenAndServe(config.Address, server))
 
 
 }
