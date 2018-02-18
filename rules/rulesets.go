@@ -61,8 +61,7 @@ func NewRuleSets() *RuleSets {
 	return &ruleSets
 }
 
-func LoadRuleSets(root string) (*RuleSets, error) {
-	ruleSets := NewRuleSets()
+func (rs *RuleSets) LoadRuleSets(root string) (*RuleSets, error) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Warnf("WalkFunc Error, %s\n", err)
@@ -71,13 +70,13 @@ func LoadRuleSets(root string) (*RuleSets, error) {
 		go func() {
 			if ruleSet, err := LoadRuleSet(path); err == nil {
 				log.Debugf("Adding: %s\n", path)
-				ruleSets.Lock.Lock()
-				ruleSets.ruleSets = append(ruleSets.ruleSets, ruleSet)
-				ruleSets.Lock.Unlock()
+				rs.Lock.Lock()
+				rs.ruleSets = append(rs.ruleSets, ruleSet)
+				rs.Lock.Unlock()
 			} else {
 				// possibly caused by re2 bug(feature)
 				// or not a xml file
-				log.Infof("Parse rule fail, ignore %s (caused by [%s])", path, err)
+				log.Debugf("Parse rule fail, ignore %s (caused by [%s])", path, err)
 			}
 		}()
 		return nil
@@ -86,6 +85,6 @@ func LoadRuleSets(root string) (*RuleSets, error) {
 		log.Warnf("Walk Error, %s\n", err)
 		return nil, err
 	}
-	log.Infof("Load \"%s\" Complete", root)
-	return ruleSets, nil
+	log.Infof("Load [%s] Complete", root)
+	return rs, nil
 }
