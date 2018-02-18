@@ -3,12 +3,10 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"github.com/lightsing/makehttps/rules"
 )
 
 const configName = "config.json"
@@ -49,13 +47,13 @@ type Config struct {
 func findConfig(name string) (*Config, error) {
 	for _, path := range configPaths {
 		path = filepath.Join(path, configName)
-		fmt.Println(path)
 		if _, err := os.Stat(path); err != nil {
 			continue
 		}
 		if data, err := ioutil.ReadFile(path); err == nil {
 			config := &Config{}
 			if json.Unmarshal(data, config) == nil {
+				log.Infof("found config at %s", path)
 				return config, nil
 			}
 		}
@@ -90,14 +88,6 @@ func Init(name string) *Config {
 		log.SetLevel(log.PanicLevel)
 	case "quite":
 		log.SetLevel(0)
-	}
-
-	for _, rule := range config.Rules {
-		if err := rules.CheckRule(&rule); err == nil {
-			config.AvailableRules = append(config.AvailableRules, rule.Path)
-		} else {
-			log.Errorf("Rule check fail by (%s)", err)
-		}
 	}
 
 	return config

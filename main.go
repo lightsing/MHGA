@@ -16,6 +16,16 @@ var Version string
 func main() {
 	// Only log the warning severity or above.
 	config := config.Init(name)
+	for _, rule := range config.Rules {
+		if err := rules.CheckRule(&rule); err == nil {
+			config.AvailableRules = append(config.AvailableRules, rule.Path)
+		} else {
+			log.Errorf("Rule check fail by (%s)", err)
+		}
+	}
+	/*if len(config.AvailableRules) == 0 {
+		panic("no available rules")
+	}*/
 	start := time.Now()
 	rules := rules.NewRuleSets()
 	for _, path := range config.AvailableRules {
