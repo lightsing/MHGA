@@ -85,6 +85,6 @@ func (rs *RuleSets) LoadRuleSets(root string) (*RuleSets, error) {
 		log.Warnf("Walk Error, %s\n", err)
 		return nil, err
 	}
-	log.Infof("Load \"%s\" Complete", root)
+	log.Infof("Load [%s] Complete", root)
 	return rs, nil
 }

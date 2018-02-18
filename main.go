@@ -31,7 +31,7 @@ func main() {
 	for _, path := range config.AvailableRules {
 		rules.LoadRuleSets(path)
 	}
-	log.Warnf("Load all rule in %s", time.Since(start))
+	log.Infof("Load all rule in %s", time.Since(start))
 	server := goproxy.NewProxyHttpServer()
 	responseBuilder := proxy.NewResponseBuilder(Version)
 	server.OnRequest().DoFunc(
