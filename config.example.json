@@ -1,0 +1,21 @@
+{
+    "rules": [
+      {
+        "name": "https-everywhere",
+        "type": "git",
+        "update": true,
+        "git": {
+          "upstream": "https://github.com/lightsing/https-everywhere.git",
+          "path": "rules/https-everywhere",
+          "depth": 1,
+          "single-branch": true,
+          "branch": "rules"
+        },
+        "path": "rules/https-everywhere/src/chrome/content/rules"
+      }
+    ],
+    "address": "127.0.0.1:8080",
+    "log": {
+      "level": "info"
+    }
+  }
