@@ -1,15 +1,15 @@
 package proxy
 
 import (
-	"github.com/elazarl/goproxy"
 	"bytes"
+	"github.com/elazarl/goproxy"
+	"html/template"
 	"io/ioutil"
 	"net/http"
-	"html/template"
 )
 
 type ResponseBuilder struct {
-	version string
+	version  string
 	template *template.Template
 }
 
@@ -18,7 +18,7 @@ func (rsb *ResponseBuilder) mustRender(code int) *bytes.Buffer {
 	if err := rsb.template.Execute(&buf, template.FuncMap{
 		"StatusCode": code,
 		"StatusText": http.StatusText(code),
-		"Version": rsb.version,
+		"Version":    rsb.version,
 	}); err != nil {
 		panic(err)
 	}

@@ -2,15 +2,16 @@ package main
 
 import (
 	"github.com/elazarl/goproxy"
-	"github.com/lightsing/makehttps/rules"
-	"github.com/lightsing/makehttps/proxy"
 	"github.com/lightsing/makehttps/config"
+	"github.com/lightsing/makehttps/proxy"
+	"github.com/lightsing/makehttps/rules"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
 const name = "mhga"
+
 var Version string
 
 func main() {
@@ -52,6 +53,5 @@ func main() {
 			return req, nil
 		})
 	log.Fatal(http.ListenAndServe(config.Address, server))
-
 
 }

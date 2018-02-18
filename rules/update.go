@@ -1,12 +1,13 @@
 package rules
 
 import (
-	"github.com/lightsing/makehttps/git"
-	"github.com/lightsing/makehttps/config"
-	"os"
 	"errors"
+	"github.com/lightsing/makehttps/config"
+	"github.com/lightsing/makehttps/git"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
+
 func CheckRule(ruleConfig *config.RuleConfig) error {
 	switch ruleConfig.Type {
 	case "git":

@@ -1,8 +1,8 @@
 package git
 
 import (
-	"io"
 	"fmt"
+	"io"
 	"regexp"
 )
 

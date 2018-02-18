@@ -30,15 +30,15 @@ type RuleConfig struct {
 }
 
 type Config struct {
-	Rules []RuleConfig `json:"rules"`
-	Address  string `json:"address"`
+	Rules          []RuleConfig `json:"rules"`
+	Address        string       `json:"address"`
 	AvailableRules []string
-	Log   struct {
+	Log            struct {
 		Level string `json:"level"`
 	} `json:"log"`
 }
 
-func findConfig(name string) (*Config, error) {
+func findConfig() (*Config, error) {
 	for _, path := range configPaths {
 		path = filepath.Join(path, configName)
 		if _, err := os.Stat(path); err != nil {
@@ -55,8 +55,8 @@ func findConfig(name string) (*Config, error) {
 	return nil, errors.New("config not found")
 }
 
-func mustFindConfig(name string) *Config {
-	config, err := findConfig(name)
+func mustFindConfig() *Config {
+	config, err := findConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +64,7 @@ func mustFindConfig(name string) *Config {
 }
 
 func Init(name string) *Config {
-	config := mustFindConfig(name)
+	config := mustFindConfig()
 	config.AvailableRules = make([]string, 0)
 
 	switch config.Log.Level {

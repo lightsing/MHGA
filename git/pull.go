@@ -2,8 +2,8 @@ package git
 
 import (
 	"github.com/lightsing/makehttps/config"
-	"os/exec"
 	"github.com/sirupsen/logrus"
+	"os/exec"
 )
 
 func Update(config config.GitConfig) error {
