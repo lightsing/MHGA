@@ -26,18 +26,19 @@ func (rsb *ResponseBuilder) mustRender(code int) *bytes.Buffer {
 }
 
 func (rsb *ResponseBuilder) Gen(req *http.Request, uri string, code int) *http.Response {
-	resp := &http.Response{}
-	resp.Request = req
-	resp.TransferEncoding = req.TransferEncoding
-	resp.Header = make(http.Header)
-	resp.Header.Add("Location", uri)
-	resp.Header.Add("Server", rsb.version)
-	resp.Header.Add("Content-Type", goproxy.ContentTypeHtml)
-	resp.StatusCode = code
 	buf := rsb.mustRender(code)
-	resp.ContentLength = int64(buf.Len())
-	resp.Body = ioutil.NopCloser(buf)
-	return resp
+	return &http.Response{
+		Request: req,
+		TransferEncoding: req.TransferEncoding,
+		Header: http.Header{
+			"Location": []string{uri},
+			"Server": []string{rsb.version},
+			"Content-Type": []string{goproxy.ContentTypeHtml},
+		},
+		StatusCode: code,
+		ContentLength: int64(buf.Len()),
+		Body: ioutil.NopCloser(buf),
+	}
 }
 
 func NewResponseBuilder(version string) *ResponseBuilder {

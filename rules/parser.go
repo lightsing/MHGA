@@ -98,7 +98,8 @@ func LoadRuleSet(any interface{}) (*RuleSet, error) {
 		} else {
 			return LoadRuleSet(reader)
 		}
-	} else if reader, ok := any.(*os.File); ok {
+	}
+	if reader, ok := any.(*os.File); ok {
 		var ruleSet RuleSet
 		if err := xml.NewDecoder(reader).Decode(&ruleSet); err != nil {
 			return nil, err
@@ -110,7 +111,6 @@ func LoadRuleSet(any interface{}) (*RuleSet, error) {
 			}
 			return &ruleSet, nil
 		}
-	} else {
-		return nil, errors.New("arg type error")
 	}
+	return nil, errors.New("arg type error")
 }
